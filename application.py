@@ -1,7 +1,7 @@
 import discord
 import requests
 import os
-
+from datetime import datetime, timedelta
 
 from discord.ext import commands
 
@@ -11,10 +11,11 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-max_messages = 5
+max_messages = 10
 message_history = {}
 sender_history = {}
 nickname_history = {}
+last_message_time = {}
 
 @bot.event
 async def on_ready():
@@ -29,6 +30,7 @@ async def on_message(message):
         message_history[channel_id] = []
         sender_history[channel_id] = []
         nickname_history[channel_id] = []
+        last_message_time[channel_id] = None
 
     message_history[channel_id].append(message.content)
     sender_history[channel_id].append(str(message.author))
@@ -45,7 +47,8 @@ async def on_message(message):
     formatted_history = "\n".join(f"{nickname}:{message}" for nickname, message in zip(nickname_history[channel_id], message_history[channel_id]))
     print(f"Formatted history in channel {channel_id}:\n{formatted_history}")
 
-    if "charles" in message.content.lower() and message.author != bot.user:
+    if ("charles" in message.content.lower() and message.author != bot.user) or \
+            (last_message_time[channel_id] is not None and datetime.now() - last_message_time[channel_id] <= timedelta(minutes=1)):
 
         messages = [
             {
@@ -73,6 +76,7 @@ async def on_message(message):
             print(f"Error: {e}")
 
         await message.channel.send(message_reply)
+        last_message_time[channel_id] = datetime.now()
 
     await bot.process_commands(message)
 
