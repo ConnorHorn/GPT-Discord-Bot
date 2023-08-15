@@ -12,7 +12,7 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-max_messages = 5
+max_messages = 10
 message_history = {}
 sender_history = {}
 nickname_history = {}
