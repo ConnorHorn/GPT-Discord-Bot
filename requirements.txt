@@ -1,3 +1,6 @@
 discord
 requests
 pyttsx3
+asyncio
+PyNaCl
+cffi
