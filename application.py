@@ -1,13 +1,14 @@
 import discord
-import requests
-import os
-from datetime import datetime, timedelta
-
 from discord.ext import commands
+import requests
+from datetime import datetime, timedelta
+import pyttsx3
+import asyncio
 
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
+intents.voice_states = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -16,6 +17,8 @@ message_history = {}
 sender_history = {}
 nickname_history = {}
 last_message_time = {}
+
+engine = pyttsx3.init()
 
 @bot.event
 async def on_ready():
@@ -77,6 +80,18 @@ async def on_message(message):
 
         await message.channel.send(message_reply)
         last_message_time[channel_id] = datetime.now()
+
+        # Check if the user who sent the last message is in a voice channel
+        member = message.guild.get_member(message.author.id)
+        if member.voice and member.voice.channel:
+            voice_channel = member.voice.channel
+            vc = await voice_channel.connect()
+            engine.save_to_file(message_reply, 'tts_output.mp3')
+            engine.runAndWait()
+            vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source="tts_output.mp3"))
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            await vc.disconnect()
 
     await bot.process_commands(message)
 
