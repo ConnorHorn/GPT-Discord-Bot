@@ -1,9 +1,10 @@
+import asyncio
 import discord
 from discord.ext import commands
 import requests
 from datetime import datetime, timedelta
-import pyttsx3
-import asyncio
+import os
+import base64
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -17,8 +18,6 @@ message_history = {}
 sender_history = {}
 nickname_history = {}
 last_message_time = {}
-
-engine = pyttsx3.init()
 
 @bot.event
 async def on_ready():
@@ -86,8 +85,19 @@ async def on_message(message):
         if member.voice and member.voice.channel:
             voice_channel = member.voice.channel
             vc = await voice_channel.connect()
-            engine.save_to_file(message_reply, 'tts_output.mp3')
-            engine.runAndWait()
+            tts_url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyDuSXbNLbZ40_OQl4XtHtPYP_3o7iTHD-4"
+            tts_data = {
+                "input": {"text": message_reply},
+                "voice": {"languageCode": "en-US", "name": "en-US-Wavenet-F"},
+                "audioConfig": {"audioEncoding": "MP3"}
+            }
+            tts_response = requests.post(tts_url, json=tts_data)
+            print("Response Status Code:", tts_response.status_code)
+            print("Response Content:", tts_response.text)
+            audio_content = tts_response.json()['audioContent']
+            audio_data = base64.b64decode(audio_content)
+            with open('tts_output.mp3', 'wb') as f:
+                f.write(audio_data)
             vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source="tts_output.mp3"))
             while vc.is_playing():
                 await asyncio.sleep(1)
@@ -96,3 +106,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 bot.run("MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4")
+
