@@ -1,5 +1,9 @@
 import discord
 import requests
+import os
+
+os.environ['BOT_TOKEN'] = 'MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4'
+
 from discord.ext import commands
 
 intents = discord.Intents.default()
@@ -73,4 +77,4 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run("MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4")
+bot.run(os.environ.get('BOT_TOKEN'))
