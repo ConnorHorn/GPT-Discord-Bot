@@ -11,7 +11,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-max_messages = 10
+max_messages = 5
 message_history = {}
 sender_history = {}
 nickname_history = {}
@@ -48,7 +48,7 @@ async def on_message(message):
     print(f"Formatted history in channel {channel_id}:\n{formatted_history}")
 
     if ("charles" in message.content.lower() and message.author != bot.user) or \
-            (last_message_time[channel_id] is not None and datetime.now() - last_message_time[channel_id] <= timedelta(minutes=1)):
+            (last_message_time[channel_id] is not None and datetime.now() - last_message_time[channel_id] <= timedelta(minutes=1) and sender_history[channel_id][-1] != str(bot.user)):
 
         messages = [
             {
