@@ -1,6 +1,6 @@
 import asyncio
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import requests
 from datetime import datetime, timedelta
 import os
@@ -26,9 +26,18 @@ async def leave_voice_channel(vc):
         await vc.disconnect()
 
 
+@tasks.loop(minutes=1)
+async def check_voice_channels():
+    for channel_id, last_time in list(last_bot_message_time.items()): # Create a copy of the dictionary to avoid modifying it while iterating
+        if datetime.now() - last_time > timedelta(minutes=1):
+            await leave_voice_channel(bot.voice_clients[0] if bot.voice_clients else None)
+            last_bot_message_time.pop(channel_id)
+
+
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}")
+    check_voice_channels.start()
 
 
 @bot.event
@@ -130,10 +139,6 @@ async def on_message(message):
             while vc.is_playing():
                 await asyncio.sleep(1)
             last_bot_message_time[channel_id] = datetime.now()
-
-        if channel_id in last_bot_message_time and datetime.now() - last_bot_message_time[channel_id] > timedelta(minutes=5):
-            await leave_voice_channel(bot.voice_clients[0] if bot.voice_clients else None)
-            last_bot_message_time.pop(channel_id)
 
     await bot.process_commands(message)
 
