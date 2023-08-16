@@ -18,6 +18,12 @@ message_history = {}
 sender_history = {}
 nickname_history = {}
 last_message_time = {}
+last_bot_message_time = {}
+
+
+async def leave_voice_channel(vc):
+    if vc:
+        await vc.disconnect()
 
 
 @bot.event
@@ -80,6 +86,7 @@ async def on_message(message):
             message_reply = str(message_reply).replace("Charles (you):", "")
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
+
         await message.channel.send(message_reply)
         last_message_time[channel_id] = datetime.now()
 
@@ -87,7 +94,13 @@ async def on_message(message):
         member = message.guild.get_member(message.author.id)
         if member.voice and member.voice.channel:
             voice_channel = member.voice.channel
-            vc = await voice_channel.connect()
+            if bot.voice_clients:
+                vc = bot.voice_clients[0]
+                if vc.channel != voice_channel:
+                    await vc.move_to(voice_channel)
+            else:
+                vc = await voice_channel.connect()
+
             tts_url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyDuSXbNLbZ40_OQl4XtHtPYP_3o7iTHD-4"
             tts_data = {
                 "input": {"text": message_reply},
@@ -104,7 +117,11 @@ async def on_message(message):
             vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source="tts_output.mp3"))
             while vc.is_playing():
                 await asyncio.sleep(1)
-            await vc.disconnect()
+            last_bot_message_time[channel_id] = datetime.now()
+
+        if channel_id in last_bot_message_time and datetime.now() - last_bot_message_time[channel_id] > timedelta(minutes=5):
+            await leave_voice_channel(bot.voice_clients[0] if bot.voice_clients else None)
+            last_bot_message_time.pop(channel_id)
 
     await bot.process_commands(message)
 
