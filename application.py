@@ -19,13 +19,14 @@ sender_history = {}
 nickname_history = {}
 last_message_time = {}
 
+
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}")
 
+
 @bot.event
 async def on_message(message):
-
     channel_id = str(message.channel.id)
 
     if channel_id not in message_history:
@@ -46,11 +47,13 @@ async def on_message(message):
         sender_history[channel_id].pop(0)
         nickname_history[channel_id].pop(0)
 
-    formatted_history = "\n".join(f"{nickname}:{message}" for nickname, message in zip(nickname_history[channel_id], message_history[channel_id]))
+    formatted_history = "\n".join(
+        f"{nickname}:{message}" for nickname, message in zip(nickname_history[channel_id], message_history[channel_id]))
     print(f"Formatted history in channel {channel_id}:\n{formatted_history}")
 
     if ("charles" in message.content.lower() and message.author != bot.user) or \
-            (last_message_time[channel_id] is not None and datetime.now() - last_message_time[channel_id] <= timedelta(minutes=1) and sender_history[channel_id][-1] != str(bot.user)):
+            (last_message_time[channel_id] is not None and datetime.now() - last_message_time[channel_id] <= timedelta(
+                minutes=1) and sender_history[channel_id][-1] != str(bot.user)):
 
         messages = [
             {
@@ -74,7 +77,7 @@ async def on_message(message):
             response = requests.post(url, json=data)
             response.raise_for_status()
             message_reply = response.json()['content']
-            message_reply.replace("Charles (you):", "")
+            message_reply = str(message_reply).replace("Charles (you):", "")
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
         await message.channel.send(message_reply)
@@ -105,5 +108,5 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run("MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4")
 
+bot.run("MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4")
