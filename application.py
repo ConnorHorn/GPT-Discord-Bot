@@ -88,7 +88,7 @@ async def on_message(message):
             tts_url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key=AIzaSyDuSXbNLbZ40_OQl4XtHtPYP_3o7iTHD-4"
             tts_data = {
                 "input": {"text": message_reply},
-                "voice": {"languageCode": "en-US", "name": "en-US-Wavenet-F"},
+                "voice": {"languageCode": "en-IN", "name": "en-IN-Wavenet-C"},
                 "audioConfig": {"audioEncoding": "MP3"}
             }
             tts_response = requests.post(tts_url, json=tts_data)
