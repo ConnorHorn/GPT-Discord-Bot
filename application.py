@@ -74,9 +74,9 @@ async def on_message(message):
             response = requests.post(url, json=data)
             response.raise_for_status()
             message_reply = response.json()['content']
+            message_reply.replace("Charles (you):", "")
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
-
         await message.channel.send(message_reply)
         last_message_time[channel_id] = datetime.now()
 
