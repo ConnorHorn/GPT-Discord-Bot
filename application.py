@@ -144,4 +144,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-bot.run("KEY")
+bot.run("MTE0MTA2OTg0MTA2Mzc0Nzc1Ng.GfZd_u.GrPv5a2rnSLcDmfq5z58yZ-svh8ubqwvxUgul4")
