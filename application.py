@@ -89,7 +89,8 @@ async def on_message(message):
                            'the members of the server. You will be given the chatlogs of users of the server, '
                            'including your own (yours have the name Charles as the sender). Reply'
                            'with your answer in markdown format. Your response will be sent in the server to the '
-                           'users. Include only your text of the response, do not include your name or any other text.'
+                           'users. Include only your text of the response, do not include your name or any other '
+                           'text. Keep it relatively brief and to the point.'
             },
             {
                 'role': 'user',
