@@ -11,7 +11,7 @@ intents.messages = True
 intents.message_content = True
 intents.voice_states = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="/", intents=intents)
 
 max_messages = 11
 message_history = {}
@@ -34,6 +34,18 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     channel_id = str(message.channel.id)
+
+    if message.content == '/clearmemory':
+        if channel_id in message_history:
+            message_history.pop(channel_id)
+            sender_history.pop(channel_id)
+            nickname_history.pop(channel_id)
+            last_message_time.pop(channel_id)
+            last_bot_message_time.pop(channel_id)
+            await message.channel.send("Memory cleared for this channel.")
+        else:
+            await message.channel.send("No memory to clear for this channel.")
+        return
 
     if channel_id not in message_history:
         message_history[channel_id] = []
